@@ -101,7 +101,7 @@ class User
     }
 
     public function checkUsername($username) {
-        $stmt = $this->pdo->prepare("SELECT `username` = :username ");
+        $stmt = $this->pdo->prepare("SELECT `username` FROM `users` WHERE `username` = :username ");
         $stmt->bindParam(":username", $username, PDO::PARAM_STR);
         $stmt->execute();
         $count = $stmt->rowCount();
@@ -146,5 +146,26 @@ class User
         } else {
             $GLOBALS['imageError'] = "The extension is not allowed";
         }
+    }
+
+    public function checkPassword($password){
+        $stmt = $this->pdo->prepare("SELECT `password` FROM `users` WHERE `password` = :password ");
+        $stmt->bindParam(":password", md5($password), PDO::PARAM_STR);
+        $stmt->execute();
+        $count = $stmt->rowCount();
+        if($count > 0){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public function search($search){
+        $stmt = $this->pdo->prepare("SELECT `user_id`, `username`, `screenName`,`profileImage`, `profileCover` FROM `users` WHERE `username` LIKE  ? OR `screenName` LIKE ? ");
+        $stmt->bindValue(1, $search.'%', PDO::PARAM_STR);//first ?
+        $stmt->bindValue(2, $search.'%', PDO::PARAM_STR);//second ?
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 }

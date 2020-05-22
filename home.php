@@ -6,10 +6,6 @@ if($getFromUser->loggedIn() === false){
     header('Location: index.php');
 }
 ?>
-<!--
-   This template created by Meralesson.com
-   This template only use for educational purpose
--->
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -67,7 +63,7 @@ if($getFromUser->loggedIn() === false){
         </div><!-- nav container ends -->
 
     </div><!-- header wrapper end -->
-
+    <script type="text/javascript" src="assets/js/search.js"></script>
     <!---Inner wrapper-->
     <div class="inner-wrapper">
         <div class="in-wrapper">

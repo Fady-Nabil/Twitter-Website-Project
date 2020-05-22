@@ -12,4 +12,4 @@ $getFromUser = new User($pdo);
 $getFromTweet = new Tweet($pdo);
 $getFromFollow = new Follow($pdo);
 
-define("BASE_URL", "http://localhost/twitter/");
+define("BASE_URL", "http://localhost:3000/twitter/");
