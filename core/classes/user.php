@@ -42,7 +42,7 @@ class User
     public function logout(){
          $_SESSION = array();
          session_destroy();
-         header('Location:../index.php');
+         header('Location: '. BASE_URL .'index.php');
     }
 
     public function checkEmail($email){
@@ -85,10 +85,66 @@ class User
         $columns = '';
         $i =1;
         foreach ($fields as $name => $value){
-            $columns .= "{$name} = :{$name}";
-            if(i < count($fields)){
-                $columns .= ', ';
+            $columns .= "`{$name}` = :{$name}";
+            if($i < count($fields)){
+                $columns .= ',';
             }
+            $i++;
+        }
+        $sql = "UPDATE {$table} SET {$columns} WHERE `user_id` = {$user_id} ";
+        if($stmt = $this->pdo->prepare($sql)){
+            foreach ($fields as $key => $value){
+                $stmt->bindValue(':'.$key, $value);
+            }
+            $stmt->execute();
+        }
+    }
+
+    public function checkUsername($username) {
+        $stmt = $this->pdo->prepare("SELECT `username` = :username ");
+        $stmt->bindParam(":username", $username, PDO::PARAM_STR);
+        $stmt->execute();
+        $count = $stmt->rowCount();
+        if($count > 0){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public function userIdByUsername($username){
+        $stmt = $this->pdo->prepare("SELECT `user_id` FROM `users` WHERE  `username` = :username ");
+        $stmt->bindParam(":username", $username, PDO::PARAM_STR);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_OBJ);
+        return $user->user_id;
+    }
+
+    public function loggedIn() {
+        return (isset($_SESSION['user_id'])) ? true : false;
+    }
+
+    public function uploadImage($file){
+        $fileName = basename($file['name']);
+        $fileTmp =  $file['tmp_name'];
+        $fileSize = $file['size'];
+        $error = $file['error'];
+        $ext = explode('.', $fileName);
+        $ext = strtolower(end($ext));
+        $allowed_ext = array('jpg', 'bng', 'jpeg');
+        if(in_array($ext, $allowed_ext) === true){
+            if($error === 0){
+                if($fileSize <= 209272152){
+                    $fileRoot = 'users/' . $fileName;
+                    move_uploaded_file($fileTmp, $fileRoot);
+                    return $fileRoot;
+                }else {
+                    $GLOBALS['imageError'] = "The file size is too large";
+                }
+            }
+        } else {
+            $GLOBALS['imageError'] = "The extension is not allowed";
         }
     }
 }
